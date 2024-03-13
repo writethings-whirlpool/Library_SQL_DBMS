@@ -1,0 +1,65 @@
+CREATE DATABASE LibraryManagement;
+USE LibraryManagement;
+CREATE TABLE Students (
+    id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(20)
+);
+CREATE TABLE Books (
+    id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255),
+    author VARCHAR(255),
+    category VARCHAR(100),
+    quantity INT,
+    available INT
+);
+CREATE TABLE BorrowedBooks (
+    id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    studentID INT,
+    bookID INT,
+    borrowedDate DATE,
+    dueDate DATE,
+    returnedDate DATE,
+    FOREIGN KEY (studentID) REFERENCES Students(id),
+    FOREIGN KEY (bookID) REFERENCES Books(id)
+);
+INSERT INTO Students (name, email, phone)
+VALUES ('Eren Yeager', 'eren@titan.com', '911-111-111');
+INSERT INTO Students (name, email, phone)
+VALUES ('Peter Parker', 'parker@multiverse.com', '111-111-119');
+INSERT INTO Books (title, author, category, quantity, available)
+VALUES ('The Angels Game', 'Carlos Ruiz Zafon', 'Fiction', 5, 5);
+INSERT INTO Books (title, author, category, quantity, available)
+VALUES ('Where the Sidewalk Ends', 'Shel Silverstein', 'Poetry', 3, 3);
+INSERT INTO Books (title, author, category, quantity, available)
+VALUES ('Dracula', 'Bram Stoker', 'Classic', 4, 3);
+INSERT INTO BorrowedBooks (studentID, bookID, borrowedDate, dueDate, returnedDate)
+VALUES (1, 1, '2024-01-15', '2024-01-30', NULL);
+INSERT INTO BorrowedBooks (studentID, bookID, borrowedDate, dueDate, returnedDate)
+VALUES (2, 3, '2024-02-01', '2024-02-15', NULL);
+
+SELECT * FROM Students;
+SELECT id, name, phone
+FROM Students
+WHERE name LIKE '%Simon%';
+UPDATE Students
+SET phone = '172-025-1640'
+WHERE id = 2;
+SELECT * FROM BorrowedBooks WHERE studentID = 1;
+SELECT s.name AS student_name, b.title AS book_title, b.author AS book_author
+FROM BorrowedBooks bb
+JOIN Students s ON bb.studentID = s.id
+JOIN Books b ON bb.bookID = b.id
+WHERE s.id = 1;
+SELECT * FROM BorrowedBooks;
+DELETE FROM BorrowedBooks WHERE id = 2;
+SELECT b.title AS book_title, COUNT(*) AS num_borrowed
+FROM BorrowedBooks bb
+JOIN Books b ON bb.bookID = b.id
+GROUP BY b.title
+ORDER BY num_borrowed DESC;
+SELECT id, title, category, quantity, available,
+    (SELECT AVG(price) FROM Books) AS avg_quantity
+FROM Books
+WHERE quantity > (SELECT AVG(quantity) FROM Books);
